@@ -2,7 +2,40 @@
 
 A Retrofit interface for [Monzo's public API](https://monzo.com/docs/).
 
-# License
+## Binaries
+```groovy
+repositories {
+    maven { url "https://jitpack.io" }
+}
+
+dependencies {
+    compile 'com.github.ChristianGarcia:MonzoRetrofit:<latest_version>'
+}
+```
+
+Latest version: [![](https://jitpack.io/v/ChristianGarcia/MonzoRetrofit.svg)](https://jitpack.io/#ChristianGarcia/MonzoRetrofit)
+
+## Usage
+Create a `RxMonzoApiService` through `MonzoApi.retrofitBuilder()`.
+
+Most methods require you to add an [Authorization](https://monzo.com/docs/#authentication) header with an access token
+for authorization (and authentication). The provided `AuthorizationInterceptor` handles this for you. Simply add it to your Retrofit's `OkHttpClient` and provide it when creating the `Retrofit` instance.
+
+```java
+OkHttpClient client = new OkHttpClient.Builder()
+    .addInterceptor(new AuthorizationInterceptor(() -> accessToken))
+    .build();
+
+Retrofit monzoRetrofit = MonzoApi.retrofitBuilder()
+    .client(okHttpClient)
+    .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
+    .build();
+```
+
+If you don't want to use `AuthorizationInterceptor`, requests having a `No-Authentication: true`
+header won't need an `Authorization` header. All other requests require it.
+
+## License
 
     Copyright 2017 Christian García
 
