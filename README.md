@@ -6,10 +6,7 @@ A Retrofit interface for [Monzo's public API](https://monzo.com/docs/).
 Create a `RxMonzoApiService` through `MonzoApi.retrofitBuilder()`.
 
 Most methods require you to add an [Authorization](https://monzo.com/docs/#authentication) header with an access token
-for authorization (and authentication).
-
-The provided `AuthorizationInterceptor` handles this for you. Simply add it to your Retrofit's
-`OkHttpClient` and provide it when creating a `MonzoApi`:
+for authorization (and authentication). The provided `AuthorizationInterceptor` handles this for you. Simply add it to your Retrofit's `OkHttpClient` and provide it when creating the `Retrofit` instance.
 
 ```java
 OkHttpClient client = new OkHttpClient.Builder()
