@@ -15,6 +15,13 @@
  */
 
 apply plugin: 'java'
+apply plugin: 'maven'
+
+group = 'com.christiangp'
+version = '0.1.1-SNAPSHOT'
+
+sourceCompatibility = "1.7"
+targetCompatibility = "1.7"
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -24,5 +31,27 @@ dependencies {
     compile 'com.squareup.moshi:moshi:1.4.0'
 }
 
-sourceCompatibility = "1.7"
-targetCompatibility = "1.7"
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+// To specify a license in the pom:
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+        }
+    }
+}
+
