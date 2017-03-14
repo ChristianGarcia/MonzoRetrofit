@@ -16,9 +16,11 @@
 
 apply plugin: 'java'
 apply plugin: 'maven'
+apply plugin: 'signing'
 
 group = 'com.christiangp'
-version = '0.1.1-SNAPSHOT'
+archivesBaseName = "monzo-retrofit"
+version = '0.1.2-SNAPSHOT'
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
@@ -40,7 +42,10 @@ artifacts {
     archives sourcesJar
 }
 
-// To specify a license in the pom:
+signing {
+    sign configurations.archives
+}
+
 install {
     repositories.mavenInstaller {
         pom.project {
@@ -49,6 +54,50 @@ install {
                     name 'The Apache Software License, Version 2.0'
                     url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
                     distribution 'repo'
+                }
+            }
+        }
+    }
+}
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'Monzo Retrofit'
+                packaging 'jar'
+                artifactId archivesBaseName
+                description 'A Retrofit interface for Monzo\'s public API.'
+                url 'https://github.com/ChristianGarcia/MonzoRetrofit'
+
+                scm {
+                    connection 'scm:git:git://github.com/ChristianGarcia/MonzoRetrofit.git'
+                    developerConnection 'scm:git:ssh://github.com:ChristianGarcia/MonzoRetrofit.git'
+                    url 'https://github.com/ChristianGarcia/MonzoRetrofit/'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'ChristianGarcia'
+                        name 'Christian Garcia'
+                        email 'ChristianGarcia@users.noreply.github.com'
+                    }
                 }
             }
         }

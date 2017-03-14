@@ -1,1 +1,3 @@
+gradle.properties
+secring.gpg
 /build
