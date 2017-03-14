@@ -9,4 +9,4 @@ env:
   - secure: De4qO5KSSIF+XOFE32SrXBbucltbeNIN53qtKtLckYKO5gdPi9ROW1aINhwkdIsGNQXuoKsgJiaicz/BnpHIPt+y6djwQE35anxMOe/EGedMjRaEbvo3YHLdIiyaGg3OGHHZkt3xhLSGD84mwzUHIISNGnqOXrNG3gED5M/I7LXRRc/E/PwInZe1PnCqXMVvmfZl15dwVKLWi5zzaQyU2Tmj+XbihUrBbsVLwcz7E6g5zVYI+yo7/lhuJtXF5PprbgqI+7R/PEJ0rGU2mmzIQBP116oM5xc29519TKtX41/fyr6RlKfsroFM0eQ5z0Qxt+hbZdij+qF5qilMuEQ0U798SN8BNLHDD+HuZv52756uyK9gs0rN0BMOSTo6dDweYd7K+YokZ0vOMs+J7JlLjwj/vkLqOSOUyzusoNEQZcIzK5wIjxwTGzpSSxyt9BNBdn9/lILJ1vejkkK+IFqYch0GonDCiK2Mz/cbFW5bZykN+dy0i8/sKVdbnZMLi3wtgL3kKS2iElgFkEifJh+zwJGkuEM/cHRO1qNAAhq9JbXEX25W2QFBDFCag3wQMmUzvfsuI9IfiXqXieYjM0pnFpC3DeYCELHWqeIQXMOai86XDVNT3Ke5Id2dChyMG4WrMpE6yn9gdyc9Vt01AkEkgdNnvaOWyiAhuKJO5ZIGVEg=
 before_install:
 - openssl aes-256-cbc -K $encrypted_d585e49a88fe_key -iv $encrypted_d585e49a88fe_iv
-  -in secring.gpg.enc -out monzo-retrofit/secring.gpg -d
+  -in monzo-retrofit/secring.gpg.enc -out monzo-retrofit/secring.gpg -d
