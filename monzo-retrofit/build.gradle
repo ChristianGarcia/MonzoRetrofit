@@ -46,8 +46,8 @@ signing {
     sign configurations.archives
 }
 
-def ossrhUsername = $ossrhUsername?: System.getenv("ossrhUsername");
-def ossrhPassword = $ossrhPassword?: System.getenv("ossrhPassword");
+def ossrhUsername = hasProperty("ossrhUsername")?: System.getenv("ossrhUsername");
+def ossrhPassword = hasProperty("ossrhPassword")?: System.getenv("ossrhPassword");
 
 uploadArchives {
     repositories {
