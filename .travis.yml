@@ -15,7 +15,7 @@ before_install:
 
 deploy:
 - provider: script
-  script: ./gradlew uploadArchives #uploadArchives depends on the custom task checkArchivesUpload, which checks everything is fine
+  script: ./gradlew uploadArchives closeAndPromoteRepository #uploadArchives depends on the custom task checkArchivesUpload, which checks everything is fine
   skip_cleanup: true
   on:
     tags: true
