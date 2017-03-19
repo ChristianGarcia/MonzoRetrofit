@@ -4,16 +4,11 @@ A Retrofit interface for [Monzo's public API](https://monzo.com/docs/).
 
 ## Binaries
 ```groovy
-repositories {
-    maven { url "https://jitpack.io" }
-}
-
 dependencies {
-    compile 'com.github.ChristianGarcia:MonzoRetrofit:<latest_version>'
+    compile 'com.christiangp:monzo-retrofit:<latest_version>'
 }
 ```
-
-Latest version: [![](https://jitpack.io/v/ChristianGarcia/MonzoRetrofit.svg)](https://jitpack.io/#ChristianGarcia/MonzoRetrofit)
+[![](https://img.shields.io/maven-central/v/com.christiangp/monzo-retrofit.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.christiangp%22%20a%3A%22monzo-retrofit%22)
 
 ## Usage
 Create a `RxMonzoApiService` through `MonzoApi.retrofitBuilder()`.
