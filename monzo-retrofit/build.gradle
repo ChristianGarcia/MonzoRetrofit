@@ -20,7 +20,7 @@ apply plugin: 'signing'
 
 group = 'com.christiangp'
 archivesBaseName = "monzo-retrofit"
-version = '0.1.2-SNAPSHOT'
+version = '0.1.2-RC1'
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
