@@ -16,11 +16,9 @@
 
 apply plugin: 'java'
 apply plugin: 'maven'
-apply plugin: 'signing'
 
 group = 'com.christiangp'
-archivesBaseName = "monzo-retrofit"
-version = '0.1.2-SNAPSHOT'
+version = '0.1.1-SNAPSHOT'
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
@@ -42,105 +40,18 @@ artifacts {
     archives sourcesJar
 }
 
-signing {
-    required { gradle.taskGraph.hasTask("uploadArchives") }
-    sign configurations.archives
-}
-
-task checkReleaseCandidateVersion() {
-    doLast {
-        def branchName = System.env.TRAVIS_BRANCH != null ? System.env.TRAVIS_BRANCH : getGitBranchName()
-        failIfCandidateBranchWithWrongVersion(branchName, "release/", version)
-        failIfCandidateBranchWithWrongVersion(branchName, "hotfix/", version)
-    }
-
-}
-
-task checkArchivesUpload() {
-    doLast {
-        if (version.contains("-SNAPSHOT")) {
-            System.out.println("Snapshot upload: $version")
-            return;
-        }
-
-        System.out.println("Release upload")
-        //Release or release candidate
-        def tagName = System.env.TRAVIS_TAG
-        if (tagName == null) throw new IllegalStateException("Attempting a release from not a tag. Use CI")
-
-        if (tagName != version) {
-            throw new IllegalArgumentException("The tag name ($tagName) does not match the build version name ($version)")
-        }
-        System.out.println("Checks for tag $tagName successful")
-    }
-}
-
-def ossrh_Username = hasProperty("ossrhUsername") ? ossrhUsername : System.getenv("ossrhUsername");
-def ossrh_Password = hasProperty("ossrhPassword") ? ossrhPassword : System.getenv("ossrhPassword");
-
-uploadArchives {
-    dependsOn checkArchivesUpload
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: ossrh_Username, password: ossrh_Password)
-            }
-
-            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                authentication(userName: ossrh_Username, password: ossrh_Password)
-            }
-
-            pom.project {
-                name 'Monzo Retrofit'
-                packaging 'jar'
-                artifactId archivesBaseName
-                description 'A Retrofit interface for Monzo\'s public API.'
-                url 'https://github.com/ChristianGarcia/MonzoRetrofit'
-
-                scm {
-                    connection 'scm:git:git://github.com/ChristianGarcia/MonzoRetrofit.git'
-                    developerConnection 'scm:git:ssh://github.com:ChristianGarcia/MonzoRetrofit.git'
-                    url 'https://github.com/ChristianGarcia/MonzoRetrofit/'
-                }
-
-                licenses {
-                    license {
-                        name 'The Apache License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id 'ChristianGarcia'
-                        name 'Christian Garcia'
-                        email 'ChristianGarcia@users.noreply.github.com'
-                    }
+// To specify a license in the pom:
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution 'repo'
                 }
             }
         }
     }
 }
 
-compileJava.dependsOn checkReleaseCandidateVersion
-
-def getGitBranchName() {
-    // Triple double-quotes for the breaklines
-    def workingBranch = """git --git-dir=${rootDir}/.git
-                               --work-tree=${rootDir}
-                               rev-parse --abbrev-ref HEAD""".execute().text.trim()
-    return workingBranch
-}
-
-def static void failIfCandidateBranchWithWrongVersion(branchName, prefix, version) {
-    if (branchName.indexOf(prefix) == -1) {
-        return
-    }
-    def branchBuildVersion = branchName.substring(branchName.indexOf(prefix) + prefix.length())
-
-    if (!version.startsWith(branchBuildVersion)) {
-        throw new IllegalArgumentException("The branch version ($branchBuildVersion) does not match the build version ($version)")
-    }
-}
