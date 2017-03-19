@@ -1,4 +1,6 @@
 # MonzoRetrofit
+[![Build Status](https://travis-ci.org/ChristianGarcia/MonzoRetrofit.svg?branch=master)](https://travis-ci.org/ChristianGarcia/MonzoRetrofit)
+[![](https://img.shields.io/maven-central/v/com.christiangp/monzo-retrofit.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.christiangp%22%20a%3A%22monzo-retrofit%22)
 
 A Retrofit interface for [Monzo's public API](https://monzo.com/docs/).
 
@@ -8,7 +10,6 @@ dependencies {
     compile 'com.christiangp:monzo-retrofit:<latest_version>'
 }
 ```
-[![](https://img.shields.io/maven-central/v/com.christiangp/monzo-retrofit.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.christiangp%22%20a%3A%22monzo-retrofit%22)
 
 ## Usage
 Create a `RxMonzoApiService` through `MonzoApi.retrofitBuilder()`.
