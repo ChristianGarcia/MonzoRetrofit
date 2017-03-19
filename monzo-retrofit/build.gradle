@@ -43,13 +43,43 @@ artifacts {
 }
 
 signing {
+    required { gradle.taskGraph.hasTask("uploadArchives") }
     sign configurations.archives
+}
+
+task checkReleaseCandidateVersion() {
+    doLast {
+        def branchName = System.env.TRAVIS_BRANCH != null ? System.env.TRAVIS_BRANCH : getGitBranchName()
+        failIfCandidateBranchWithWrongVersion(branchName, "release/", version)
+        failIfCandidateBranchWithWrongVersion(branchName, "hotfix/", version)
+    }
+
+}
+
+task checkArchivesUpload() {
+    doLast {
+        if (version.contains("-SNAPSHOT")) {
+            System.out.println("Snapshot upload: $version")
+            return;
+        }
+
+        System.out.println("Release upload")
+        //Release or release candidate
+        def tagName = System.env.TRAVIS_TAG
+        if (tagName == null) throw new IllegalStateException("Attempting a release from not a tag. Use CI")
+
+        if (tagName != version) {
+            throw new IllegalArgumentException("The tag name ($tagName) does not match the build version name ($version)")
+        }
+        System.out.println("Checks for tag $tagName successful")
+    }
 }
 
 def ossrh_Username = hasProperty("ossrhUsername") ? ossrhUsername : System.getenv("ossrhUsername");
 def ossrh_Password = hasProperty("ossrhPassword") ? ossrhPassword : System.getenv("ossrhPassword");
 
 uploadArchives {
+    dependsOn checkArchivesUpload
     repositories {
         mavenDeployer {
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
@@ -94,3 +124,23 @@ uploadArchives {
     }
 }
 
+compileJava.dependsOn checkReleaseCandidateVersion
+
+def getGitBranchName() {
+    // Triple double-quotes for the breaklines
+    def workingBranch = """git --git-dir=${rootDir}/.git
+                               --work-tree=${rootDir}
+                               rev-parse --abbrev-ref HEAD""".execute().text.trim()
+    return workingBranch
+}
+
+def static void failIfCandidateBranchWithWrongVersion(branchName, prefix, version) {
+    if (branchName.indexOf(prefix) == -1) {
+        return
+    }
+    def branchBuildVersion = branchName.substring(branchName.indexOf(prefix) + prefix.length())
+
+    if (!version.startsWith(branchBuildVersion)) {
+        throw new IllegalArgumentException("The branch version ($branchBuildVersion) does not match the build version ($version)")
+    }
+}

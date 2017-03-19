@@ -1,3 +1,4 @@
 gradle.properties
 secring.gpg
+sign.tar
 /build
