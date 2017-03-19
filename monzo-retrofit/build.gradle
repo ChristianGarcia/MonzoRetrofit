@@ -53,6 +53,11 @@ signing {
     sign configurations.archives
 }
 
+nexusStaging {
+    numberOfRetries = 10
+    delayBetweenRetriesInMillis = 3000
+}
+
 task checkReleaseCandidateVersion() {
     doLast {
         def branchName = System.env.TRAVIS_BRANCH != null ? System.env.TRAVIS_BRANCH : getGitBranchName()
