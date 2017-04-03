@@ -13,24 +13,9 @@
  *     See the License for the specific language governing permissions and
  *     limitations under the License.
  */
+package com.christiangp.monzoapi;
 
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.0'
-        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
-        // For some strange reason, not including retrolambda's plugin classpath breaks the Integration test compilation
-        classpath 'me.tatarka:gradle-retrolambda:3.5.0'
-    }
-}
+public interface MonzoApiHeaders {
 
-allprojects {
-    repositories {
-        jcenter()
-    }
-    tasks.withType(Javadoc) {
-        options.addStringOption('Xdoclint:none', '-quiet')
-    }
+    String HEADER_NO_AUTHORIZATION = "No-Authentication";
 }

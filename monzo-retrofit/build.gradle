@@ -21,7 +21,7 @@ apply plugin: 'io.codearte.nexus-staging'
 
 group = 'com.christiangp'
 archivesBaseName = "monzo-retrofit"
-version = '0.1.2'
+version = '0.2.0-SNAPSHOT'
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
@@ -32,6 +32,16 @@ dependencies {
     compile 'com.squareup.retrofit2:converter-moshi:2.2.0'
     compile 'io.reactivex.rxjava2:rxjava:2.0.4'
     compile 'com.squareup.moshi:moshi:1.4.0'
+
+    testCompile ('com.jakewharton.retrofit:retrofit2-rxjava2-adapter:1.0.0') {
+        exclude group: 'com.squareup.retrofit2', module: 'retrofit'
+        exclude group: 'io.reactivex.rxjava2', module: 'rxjava'
+    }
+    testCompile 'com.jakewharton.threetenabp:threetenabp:1.0.5'
+    testCompile 'com.squareup.okhttp3:logging-interceptor:3.6.0'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:2.7.5'
+    testCompile 'org.assertj:assertj-core:3.6.2'
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {

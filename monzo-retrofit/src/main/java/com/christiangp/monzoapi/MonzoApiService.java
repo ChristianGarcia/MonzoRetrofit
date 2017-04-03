@@ -30,8 +30,7 @@ import com.christiangp.monzoapi.model.response.TransactionResponse;
 import com.christiangp.monzoapi.model.response.WebhooksResponse;
 import com.christiangp.monzoapi.model.response.WhoAmIResponse;
 
-import io.reactivex.Completable;
-import io.reactivex.Single;
+import retrofit2.Call;
 import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FieldMap;
@@ -47,7 +46,7 @@ import retrofit2.http.QueryMap;
 import static com.christiangp.monzoapi.MonzoApiHeaders.HEADER_NO_AUTHORIZATION;
 
 /**
- * RxJava 2 Retrofit interface for Monzo's API.
+ * Retrofit interface for Monzo's API.
  * <p>
  * Most methods require you to add an <a href="https://monzo.com/docs/#authentication">Authorization</a> header with the access token
  * for authorization (and authentication).
@@ -61,7 +60,6 @@ import static com.christiangp.monzoapi.MonzoApiHeaders.HEADER_NO_AUTHORIZATION;
  *
  * Retrofit monzoRetrofit = MonzoApi.retrofitBuilder()
  *     .client(okHttpClient)
- *     .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
  *     .build();
  * </code></pre>
  * If you're providing your own interceptor, requests having a <code>No-Authentication: true</code>
@@ -70,31 +68,15 @@ import static com.christiangp.monzoapi.MonzoApiHeaders.HEADER_NO_AUTHORIZATION;
  * @see <a href="https://monzo.com/docs/#authentication">https://monzo.com/docs/#authentication</a>
  * @see <a href="https://monzo.com/docs/">https://monzo.com/docs/</a>
  */
-public interface RxMonzoApiService {
+public interface MonzoApiService {
 
     /**
-     * Performs step #3 of
-     * <a href="https://monzo.com/docs/#acquire-an-access-token">
-     * Acquire an access token</a>.
-     * <p>
-     * See
-     * <a href="https://monzo.com/docs/#exchange-the-authorization-code">
-     * Exchange the authorization code</a>
-     * for its params info
-     * <p>
-     * <b>IMPORTANT</b>. Since Android apps will need to store their secret somewhere accessible to their code,
-     * your client secret should be of <b>non-confidential</b> type.
-     * <p>
-     * Non-confidential tokens expire quickly and their clients are not issued refresh tokens, so users will need to
-     * constantly grant your client access to their accounts
-     *
-     * @see <a href="https://monzo.com/docs/#acquire-an-access-token">Acquire an access token</a>
-     * @see <a href="https://monzo.com/docs/#exchange-the-authorization-code">Exchange the authorization code</a>
+     * @see RxMonzoApiService#getAccessToken(String, String, String, String, String)
      */
     @Headers(HEADER_NO_AUTHORIZATION + ": true")
     @FormUrlEncoded
     @POST("/oauth2/token")
-    Single<ExchangeAuthorizationResponse> getAccessToken(
+    Call<ExchangeAuthorizationResponse> getAccessToken(
             @Field("grant_type") String grantType,
             @Field("client_id") String clientId,
             @Field("client_secret") String clientSecret,
@@ -103,17 +85,12 @@ public interface RxMonzoApiService {
     );
 
     /**
-     * Refreshes the access token.
-     * <p>
-     * <b>IMPORTANT</b>. Only <a href="https://tools.ietf.org/html/rfc6749#section-2.1">confidential clients</a>
-     * are issued refresh tokens
-     *
-     * @see <a href="https://monzo.com/docs/#refreshing-access">https://monzo.com/docs/#refreshing-access</a>
+     * @see RxMonzoApiService#refreshToken(String, String, String, String)
      */
     @Headers(HEADER_NO_AUTHORIZATION + ": true")
     @FormUrlEncoded
     @POST("/oauth2/token")
-    Single<ExchangeAuthorizationResponse> refreshToken(
+    Call<ExchangeAuthorizationResponse> refreshAccessToken(
             @Field("grant_type") String grantType,
             @Field("client_id") String clientId,
             @Field("client_secret") String clientSecret,
@@ -121,151 +98,123 @@ public interface RxMonzoApiService {
     );
 
     /**
-     * Basic API client info
+     * @see RxMonzoApiService#getWhoAmI()
      */
     @GET("/ping/whoami")
-    Single<WhoAmIResponse> getWhoAmI();
+    Call<WhoAmIResponse> getWhoAmI();
 
     /**
-     * Lists all accounts for the authenticated user.
-     *
-     * @see <a href="https://monzo.com/docs/#list-accounts">https://monzo.com/docs/#list-accounts</a>
+     * @see RxMonzoApiService#getAccounts()
      */
     @GET("/accounts")
-    Single<AccountsResponse> getAccounts();
+    Call<AccountsResponse> getAccounts();
 
     /**
-     * Loads the balance for the authenticated user.
-     *
-     * @see <a href="https://monzo.com/docs/#read-balance">https://monzo.com/docs/#read-balance</a>
+     * @see RxMonzoApiService#getBalance(String)
      */
     @GET("/balance")
-    Single<Balance> getBalance(
+    Call<Balance> getBalance(
             @Query("account_id") String accountId
     );
 
     /**
-     * Lists all transactions for the given account.
-     *
-     * @see <a href="https://monzo.com/docs/#list-transactions">https://monzo.com/docs/#list-transactions</a>
+     * @see RxMonzoApiService#getTransactions(String, PaginationOptions)
      */
     @GET("/transactions")
-    Single<TransactionListResponse<TransactionWithMerchantId>> getTransactions(
+    Call<TransactionListResponse<TransactionWithMerchantId>> getTransactions(
             @Query("account_id") String accountId,
             @QueryMap PaginationOptions paginationOptions
     );
 
     /**
-     * Lists all transactions for the given account and includes merchant info in each transaction.
-     *
-     * @see <a href="https://monzo.com/docs/#list-transactions">https://monzo.com/docs/#list-transactions</a>
+     * @see RxMonzoApiService#getTransactionsWithMerchant(String, PaginationOptions)
      */
     @GET("/transactions?expand[]=merchant")
-    Single<TransactionListResponse<TransactionWithMerchant>> getTransactionsWithMerchant(
+    Call<TransactionListResponse<TransactionWithMerchant>> getTransactionsWithMerchant(
             @Query("account_id") String accountId,
             @QueryMap PaginationOptions paginationOptions
     );
 
     /**
-     * Loads the given transaction.
-     *
-     * @see <a href="https://monzo.com/docs/#retrieve-transaction">https://monzo.com/docs/#retrieve-transaction</a>
+     * @see RxMonzoApiService#getTransaction(String)
      */
     @GET("/transactions/{id}/")
-    Single<TransactionResponse<TransactionWithMerchantId>> getTransaction(
+    Call<TransactionResponse<TransactionWithMerchantId>> getTransaction(
             @Path("id") String transactionId
     );
 
     /**
-     * Loads the given transaction and includes the merchant info.
-     *
-     * @see <a href="https://monzo.com/docs/#retrieve-transaction">https://monzo.com/docs/#retrieve-transaction</a>
+     * @see RxMonzoApiService#getTransactionWithMerchant(String)
      */
     @GET("/transactions/{id}?expand[]=merchant")
-    Single<TransactionResponse<TransactionWithMerchant>> getTransactionWithMerchant(
+    Call<TransactionResponse<TransactionWithMerchant>> getTransactionWithMerchant(
             @Path("id") String transactionId
     );
 
     /**
-     * Adds metadata to the given transaction.
-     *
-     * @see <a href="https://monzo.com/docs/#annotate-transaction">https://monzo.com/docs/#annotate-transaction</a>
+     * @see RxMonzoApiService#addMetadataToTransaction(String, MetadataMap)
      */
     @FormUrlEncoded
     @PATCH("/transactions/{id}")
-    Single<TransactionResponse<TransactionWithMerchantId>> addMetadataToTransaction(
+    Call<TransactionResponse<TransactionWithMerchantId>> addMetadataToTransaction(
             @Path("id") String transactionId,
             @FieldMap MetadataMap metadataMap
     );
 
     /**
-     * Creates a feed item.
-     * <p>
-     * To create the {@link FeedItemMap} instance, use any of its subclasses
-     *
-     * @see <a href="https://monzo.com/docs/#feed-items">https://monzo.com/docs/#feed-items</a>
+     * @see RxMonzoApiService#createFeedItem(String, String, FeedItemMap)
      */
     @FormUrlEncoded
     @POST("/feed")
-    Completable createFeedItem(
+    Call<Void> createFeedItem(
             @Field("account_id") String accountId,
             @Field("url") String url,
             @FieldMap FeedItemMap feedItemMap
     );
 
     /**
-     * Registers a webhook.
-     *
-     * @see <a href="https://monzo.com/docs/#registering-a-webhook">https://monzo.com/docs/#registering-a-webhook</a>
+     * @see RxMonzoApiService#registerWebhook(String, String)
      */
     @FormUrlEncoded
     @POST("/webhooks")
-    Single<RegisteredWebhookResponse> registerWebhook(
+    Call<RegisteredWebhookResponse> registerWebhook(
             @Field("account_id") String accountId,
             @Field("url") String webhookUrl
     );
 
     /**
-     * Lists all webhooks.
-     *
-     * @see <a href="https://monzo.com/docs/#list-webhooks">https://monzo.com/docs/#list-webhooks</a>
+     * @see RxMonzoApiService#getWebhooks(String)
      */
     @GET("/webhooks")
-    Single<WebhooksResponse> getWebhooks(
+    Call<WebhooksResponse> getWebhooks(
             @Query("account_id") String accountId
     );
 
     /**
-     * Removes the given webhook
-     *
-     * @see <a href="https://monzo.com/docs/#deleting-a-webhook">https://monzo.com/docs/#deleting-a-webhook</a>
+     * @see RxMonzoApiService#unregisterWebhook(String)
      */
     @DELETE("/webhooks/{id}")
-    Completable unregisterWebhook(
+    Call<Void> unregisterWebhook(
             @Path("id") String webhookId
     );
 
     /**
-     * Adds an attachment to a transaction.
-     *
-     * @see <a href="https://monzo.com/docs/#register-attachment">https://monzo.com/docs/#register-attachment</a>
+     * @see RxMonzoApiService#addAttachmentToTransaction(String, String, String)
      */
     @FormUrlEncoded
     @POST("/attachment/register")
-    Single<AttachFileToTransactionResponse> addAttachmentToTransaction(
+    Call<AttachFileToTransactionResponse> addAttachmentToTransaction(
             @Field("external_id") String transactionId,
             @Field("file_url") String fileUrl,
             @Field("file_type") String fileType
     );
 
     /**
-     * Removes the given attachment from the transaction its attached to
-     *
-     * @see <a href="https://monzo.com/docs/#deregister-attachment">https://monzo.com/docs/#deregister-attachment</a>
+     * @see RxMonzoApiService#removeAttachmentFromTransaction(String)
      */
     @FormUrlEncoded
     @POST("/attachment/deregister")
-    Completable removeAttachmentFromTransaction(
+    Call<Void> removeAttachmentFromTransaction(
             @Field("id") String attachmentId
     );
 }
