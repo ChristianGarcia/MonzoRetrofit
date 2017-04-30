@@ -13,7 +13,6 @@
  *     See the License for the specific language governing permissions and
  *     limitations under the License.
  */
-
 package com.christiangp.monzoapi;
 
 import com.christiangp.monzoapi.function.SimpleProvider;
@@ -23,6 +22,8 @@ import java.io.IOException;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
+
+import static com.christiangp.monzoapi.MonzoApiHeaders.HEADER_NO_AUTHORIZATION;
 
 public final class AuthorizationInterceptor
         implements Interceptor {
@@ -37,14 +38,14 @@ public final class AuthorizationInterceptor
     public Response intercept(Chain chain)
             throws IOException {
         final Request request = chain.request();
-        if (request.header(RxMonzoApiService.HEADER_NO_AUTHORIZATION) == null) {
+        if (request.header(HEADER_NO_AUTHORIZATION) == null) {
             // Authorization header required
             return chain.proceed(request.newBuilder()
                                         .addHeader("Authorization", "Bearer " + provider.provide())
                                         .build());
         }
         return chain.proceed(request.newBuilder()
-                                    .removeHeader(RxMonzoApiService.HEADER_NO_AUTHORIZATION)
+                                    .removeHeader(HEADER_NO_AUTHORIZATION)
                                     .build());
     }
 }
